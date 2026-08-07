@@ -2,4 +2,8 @@ directions:
     run (install): python -m venv virtual_environment
     run (activate): source virtual_environment/bin/activate
     run (install): pip install pandas openpyxl
+    run (install): python -m pip install pytest
+
+To run tests:
+    python -m pytest
 
