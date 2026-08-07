@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+#ignore personal data
+.data/input/*
+.data/output/*
+
+#do not ignore folder structure
+!.data/input/.gitkeep
+!.data/output/.gitkeep
