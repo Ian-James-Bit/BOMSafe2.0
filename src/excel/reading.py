@@ -1,3 +1,4 @@
+import pathlib
 import openpyxl
 from typing import Any
 from dataclasses import dataclass
@@ -36,12 +37,11 @@ supplier_names = [
 
 # return a list, each value of the list is a mpn which is a dict holding mpn: int, row_number: int,
 # suppliers: list of dataclass (name, column index)
-def read_excel_file(path: str) -> list[dict[str,int | Any]]:
+def read_excel_file(path: pathlib.Path) -> list[dict[str,int | Any]]:
     # Give the location of the file
     # path = "data/input/Test_Bom.xlsx"
-    if(not isinstance(path, str)):
-        raise ValueError("Path must be a string.") 
-    
+    if(not isinstance(path, pathlib.Path)):
+        raise ValueError("Path must be a path object.") 
     try:
         excel = openpyxl.load_workbook(path)
         #gets active sheet
@@ -60,12 +60,16 @@ def read_excel_file(path: str) -> list[dict[str,int | Any]]:
             mpn_value=bom.cell(row=i, column=mpn_index).value
             if mpn_value is None:
                 continue
+            elif not isinstance(mpn_value, int):
+                continue
             mpn = {"mpn": mpn_value}
             mpn["row_number"] = i
             suppliers = []
             for supplier_index in supplier_indices:
                  supplier = Supplier (name = bom.cell(row=i, column=supplier_index).value,index = supplier_index)
                  if supplier.name is None:
+                    continue
+                 elif not isinstance(supplier.name, str):
                     continue
                  suppliers.append(supplier)
 
