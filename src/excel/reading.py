@@ -2,7 +2,6 @@ import pathlib
 import openpyxl
 from typing import Any
 from dataclasses import dataclass
-from typing import Tuple
 
 #so we can append API info next to relevant supplier column
 @dataclass
@@ -35,13 +34,13 @@ supplier_names = [
     "distributorsname",
 ]
 
-# return a list, each value of the list is a mpn which is a dict holding mpn: int, row_number: int,
+# return a dict, each value of the dict is a mpn which is a dict holding row_number: int,
 # suppliers: list of dataclass (name, column index)
-def read_excel_file(path: pathlib.Path) -> list[dict[str,int | Any]]:
+def read_excel_file(path: pathlib.Path | str) -> dict[str,dict[str,int | Any]]:
     # Give the location of the file
     # path = "data/input/Test_Bom.xlsx"
     if(not isinstance(path, pathlib.Path)):
-        raise ValueError("Path must be a path object.") 
+        raise ValueError("Path must be a path object or string.") 
     try:
         excel = openpyxl.load_workbook(path)
         #gets active sheet
@@ -55,15 +54,11 @@ def read_excel_file(path: pathlib.Path) -> list[dict[str,int | Any]]:
         if(len(supplier_indices) == 0):
             raise ValueError("Supplier columns not found in the Excel sheet.")
         # Process each row
-        data_list: list[dict[str,int | str | Any]] = []
+        data_list: dict[str,dict[str,int | str | Any]] = {}
         for i in range(2, row + 1):
             mpn_value=bom.cell(row=i, column=mpn_index).value
             if mpn_value is None:
                 continue
-            elif not isinstance(mpn_value, int):
-                continue
-            mpn = {"mpn": mpn_value}
-            mpn["row_number"] = i
             suppliers = []
             for supplier_index in supplier_indices:
                  supplier = Supplier (name = bom.cell(row=i, column=supplier_index).value,index = supplier_index)
@@ -72,13 +67,10 @@ def read_excel_file(path: pathlib.Path) -> list[dict[str,int | Any]]:
                  elif not isinstance(supplier.name, str):
                     continue
                  suppliers.append(supplier)
-
             # add it to list of relevant data
-            mpn["suppliers"] = suppliers
-            data_list.append(mpn)
+            data_list[mpn_value] = {"row_number": i,"suppliers": suppliers}
 
         return data_list
-    
     except Exception as e:
             print(f"An unexpected error occured: {e}")
             raise

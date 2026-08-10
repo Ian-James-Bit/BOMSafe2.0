@@ -1,13 +1,9 @@
 import openpyxl
-from typing import Any
-from dataclasses import dataclass
-from typing import Tuple
-
-# TODO: add more asserts once more test excel sheets are added to relevant test
 from src.excel import reading
 import pytest
 from pathlib import Path
 
+#TODO: add tests for bad path, bad file, bad sheet
 @pytest.fixture
 def test_excel_file():
     # Create a temporary Excel file for testing
@@ -16,8 +12,8 @@ def test_excel_file():
     sheet = workbook.active
     sheet.title = "TestSheet"
     sheet.append(["MPN", "Supplier", "Description"])
-    sheet.append([12345, "Supplier A", "Test Description 1"])
-    sheet.append([67890, "Supplier B", "Test Description 2"])
+    sheet.append(["12345", "Supplier A", "Test Description 1"])
+    sheet.append(["67890", "Supplier B", "Test Description 2"])
     workbook.save(test_file_path)
     yield test_file_path
     test_file_path.unlink()  # Clean up the temporary file after the test
@@ -72,7 +68,7 @@ def test_excel_file_5():
     sheet = workbook.active
     sheet.title = "TestSheet"
     sheet.append(["MPN", "Supplier", "Description"])
-    sheet.append(["nioe", None, "Test Description 1"])
+    sheet.append([None, None, "Test Description 1"])
     sheet.append([None, 434, "Test Description 2"])
     workbook.save(test_file_path)
     yield test_file_path
@@ -91,7 +87,6 @@ def test_is_mpn_or_supplier():
     assert reading.is_mpn_or_supplier("MPN",reading.supplier_names) == False
     assert reading.is_mpn_or_supplier("",reading.supplier_names) == False
 
-#TODO: add an assert for the case where there is no MPN column and no supplier column
 def test_relevant_column_indices(test_excel_file, test_excel_file_2, test_excel_file_3, test_excel_file_4, test_excel_file_5):
     # Test with the first Excel file
     for i in range(5):
@@ -126,7 +121,6 @@ def test_relevant_column_indices(test_excel_file, test_excel_file_2, test_excel_
             assert mpn_index == 1  # MPN is in the first column
             assert supplier_indices == [2]  # Supplier is in the second column
 
-#TODO: fix this
 def test_read_excel_file(test_excel_file, test_excel_file_2, test_excel_file_3, test_excel_file_4, test_excel_file_5):
     for i in range(5):
         if i == 0:
@@ -141,23 +135,21 @@ def test_read_excel_file(test_excel_file, test_excel_file_2, test_excel_file_3, 
             file = test_excel_file_5
         if(i == 0):
             # For the first test file, we expect the function to return the expected data
-            assert reading.read_excel_file(file) == [
-                {
-                    "mpn": 12345,
+            assert reading.read_excel_file(file) == {
+                "12345": {
                     "row_number": 2,
                     "suppliers": [reading.Supplier(name="Supplier A", index=2)]
                 },
-                {
-                    "mpn": 67890,
+                "67890": {
                     "row_number": 3,
                     "suppliers": [reading.Supplier(name="Supplier B", index=2)]
                 }
-            ]
+            }
         if i in [1, 2, 3]:
             # For the the three test files after the first, we expect a ValueError to be raised
             with pytest.raises(ValueError):
                 reading.read_excel_file(file)
         elif i == 4:
             # For the fifth test file, we expect bad values to be skipped and the function to return the expected data
-            assert reading.read_excel_file(file) == []
+            assert reading.read_excel_file(file) == {}
     
