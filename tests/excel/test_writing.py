@@ -1,7 +1,5 @@
 import openpyxl
 from src.excel import writing
-import pytest
-from pathlib import Path
 
 def test_add_data_to_bom(test_excel_file, test_excel_file_6):
     for i in range(2):

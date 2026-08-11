@@ -4,19 +4,29 @@ import pytest
 
 #TODO: add tests for bad path, bad file, bad sheet
 
-def test_is_mpn_or_supplier():
-    assert reading.is_mpn_or_supplier("'MPN",reading.mpn_names) == True
-    assert reading.is_mpn_or_supplier("Manufacture Part Number 1",reading.mpn_names) == True
-    assert reading.is_mpn_or_supplier("MPN - 1",reading.mpn_names) == True
-    assert reading.is_mpn_or_supplier("Supplier",reading.mpn_names) == False
-    assert reading.is_mpn_or_supplier("",reading.mpn_names) == False
-    assert reading.is_mpn_or_supplier("'Supplier",reading.supplier_names) == True
-    assert reading.is_mpn_or_supplier("Supplier Number 1",reading.supplier_names) == True
-    assert reading.is_mpn_or_supplier("Distributor Number 1",reading.supplier_names) == True
-    assert reading.is_mpn_or_supplier("Distributor - 1",reading.supplier_names) == True
-    assert reading.is_mpn_or_supplier("MPN",reading.supplier_names) == False
-    assert reading.is_mpn_or_supplier("",reading.supplier_names) == False
-
+def test_read_excel_file(test_excel_file, test_excel_file_2, test_excel_file_3, test_excel_file_4, test_excel_file_5, variables):
+    for i in range(5):
+        if i == 0:
+            file = test_excel_file
+        elif i == 1:
+            file = test_excel_file_2
+        elif i == 2:
+            file = test_excel_file_3
+        elif i == 3:
+            file = test_excel_file_4
+        elif i == 4:
+            file = test_excel_file_5
+        if(i == 0):
+            # For the first test file, we expect the function to return the expected data
+            assert reading.read_excel_file(file) == variables
+        if i in [1, 2, 3]:
+            # For the the three test files after the first, we expect a ValueError to be raised
+            with pytest.raises(ValueError):
+                reading.read_excel_file(file)
+        elif i == 4:
+            # For the fifth test file, we expect bad values to be skipped and the function to return the expected data
+            assert reading.read_excel_file(file) == {}
+    
 def test_relevant_column_indices(test_excel_file, test_excel_file_2, test_excel_file_3, test_excel_file_4, test_excel_file_5):
     # Test with the first Excel file
     for i in range(5):
@@ -51,35 +61,17 @@ def test_relevant_column_indices(test_excel_file, test_excel_file_2, test_excel_
             assert mpn_index == 1  # MPN is in the first column
             assert supplier_indices == [2]  # Supplier is in the second column
 
-def test_read_excel_file(test_excel_file, test_excel_file_2, test_excel_file_3, test_excel_file_4, test_excel_file_5):
-    for i in range(5):
-        if i == 0:
-            file = test_excel_file
-        elif i == 1:
-            file = test_excel_file_2
-        elif i == 2:
-            file = test_excel_file_3
-        elif i == 3:
-            file = test_excel_file_4
-        elif i == 4:
-            file = test_excel_file_5
-        if(i == 0):
-            # For the first test file, we expect the function to return the expected data
-            assert reading.read_excel_file(file) == {
-                "12345": {
-                    "row_number": 2,
-                    "suppliers": [reading.Supplier(name="Supplier A", index=2)]
-                },
-                "67890": {
-                    "row_number": 3,
-                    "suppliers": [reading.Supplier(name="Supplier B", index=2)]
-                }
-            }
-        if i in [1, 2, 3]:
-            # For the the three test files after the first, we expect a ValueError to be raised
-            with pytest.raises(ValueError):
-                reading.read_excel_file(file)
-        elif i == 4:
-            # For the fifth test file, we expect bad values to be skipped and the function to return the expected data
-            assert reading.read_excel_file(file) == {}
-    
+def test_is_mpn_or_supplier():
+    assert reading.is_mpn_or_supplier("'MPN",reading.mpn_names) == True
+    assert reading.is_mpn_or_supplier("Manufacture Part Number 1",reading.mpn_names) == True
+    assert reading.is_mpn_or_supplier("MPN - 1",reading.mpn_names) == True
+    assert reading.is_mpn_or_supplier("Supplier",reading.mpn_names) == False
+    assert reading.is_mpn_or_supplier("",reading.mpn_names) == False
+    assert reading.is_mpn_or_supplier("'Supplier",reading.supplier_names) == True
+    assert reading.is_mpn_or_supplier("Supplier Number 1",reading.supplier_names) == True
+    assert reading.is_mpn_or_supplier("Distributor Number 1",reading.supplier_names) == True
+    assert reading.is_mpn_or_supplier("Distributor - 1",reading.supplier_names) == True
+    assert reading.is_mpn_or_supplier("MPN",reading.supplier_names) == False
+    assert reading.is_mpn_or_supplier("",reading.supplier_names) == False
+
+

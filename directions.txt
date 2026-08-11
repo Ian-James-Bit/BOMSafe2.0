@@ -3,7 +3,9 @@ directions:
     run (activate): source virtual_environment/bin/activate
     run (install): pip install pandas openpyxl
     run (install): python -m pip install pytest
-
+    run (install): pip install requests
+    run (update): pip install --upgrade pip
+    run (install): pip install python-dotenv
 To run tests:
     python -m pytest
 
