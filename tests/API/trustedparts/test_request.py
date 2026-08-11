@@ -1,9 +1,19 @@
 from src.API.trustedparts import request
 import pytest
 
+def test_send_get_request(real_variables):
+    # Create a sample payload for testing
+    payload = request.create_get_request(real_variables, request.load_API_key(), request.load_Company_ID())
+    response = request.send_get_request(payload)
+    assert isinstance(response, dict)
+    assert isinstance(response["PartResults"], list)
+    assert len(response["PartResults"]) > 0
+    assert response["PartResults"][0]["PartNumber"] == "BAT54BRW-7-F"
+    assert "Distributors" in response["PartResults"][0]
+
 def test_create_get_request(variables):
-    payload = request.create_get_request(variables, "fake_test_key", "fake_test_id")
-    assert payload == {
+    test_payload = request.create_get_request(variables, "fake_test_key", "fake_test_id")
+    assert test_payload == {
             "CompanyId": "fake_test_id",
             "ApiKey": "fake_test_key",
             "Queries": [{"SearchToken": "12345"}, {"SearchToken": "67890"}],

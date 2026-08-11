@@ -4,10 +4,14 @@ from dotenv import load_dotenv
 import requests
 
 url = "https://api.trustedparts.com/v2/search"
+headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
 
 def send_get_request(payload: dict) -> dict:
     try:
-        response = requests.get(url, params=payload)
+        response = requests.post(url, headers = headers, json = payload)
         if response.status_code == 200:
             data = response.json()
             return data

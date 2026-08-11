@@ -1,6 +1,5 @@
 import pytest
 from src.excel import reading
-#test excel files for reading and writing functions with different column names and data types
 
 @pytest.fixture
 def variables():
