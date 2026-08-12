@@ -68,8 +68,8 @@ def test_add_new_data_columns(test_excel_file, test_excel_file_6):
             updated_data = writing.add_new_data_columns(bom, data)
 
             # Check if new columns were added and headers are correct
-            assert bom.cell(row=1, column=3).value == "Stock 1"
-            assert bom.cell(row=1, column=4).value == "Price 1"
+            assert bom.cell(row=1, column=3).value == "Stock"
+            assert bom.cell(row=1, column=4).value == "Price"
             assert bom.cell(row=1, column=bom.max_column).value == "Product Risk"
             
             #check column indeces are same
@@ -94,10 +94,10 @@ def test_add_new_data_columns(test_excel_file, test_excel_file_6):
                     updated_data = writing.add_new_data_columns(bom, data)
 
                     # Check if new columns were added and headers are correct
-                    assert bom.cell(row=1, column=3).value == "Stock 1"
-                    assert bom.cell(row=1, column=4).value == "Price 1"
-                    assert bom.cell(row=1, column=7).value == "Stock 2"
-                    assert bom.cell(row=1, column=8).value == "Price 2"
+                    assert bom.cell(row=1, column=3).value == "Stock"
+                    assert bom.cell(row=1, column=4).value == "Price"
+                    assert bom.cell(row=1, column=7).value == "Stock"
+                    assert bom.cell(row=1, column=8).value == "Price"
                     assert bom.cell(row=1, column=bom.max_column).value == "Product Risk"
 
                     #check if column indeces are updated correctly
@@ -117,8 +117,8 @@ def test_add_new_data_columns(test_excel_file, test_excel_file_6):
                     updated_data = writing.add_new_data_columns(bom, data)
                     
                     #check if new columns are headers are correct
-                    assert bom.cell(row=1, column=5).value == "Stock 1"
-                    assert bom.cell(row=1, column=6).value == "Price 1"
+                    assert bom.cell(row=1, column=5).value == "Stock"
+                    assert bom.cell(row=1, column=6).value == "Price"
                     assert bom.cell(row=1, column=bom.max_column).value == "Product Risk"
                     #check column indeces are same
                     for row in data:

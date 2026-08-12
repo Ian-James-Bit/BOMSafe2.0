@@ -39,7 +39,7 @@ supplier_names = [
 def read_excel_file(path: pathlib.Path | str) -> dict[str,dict[str,int | Any]]:
     # Give the location of the file
     # path = "data/input/Test_Bom.xlsx"
-    if(not isinstance(path, pathlib.Path)):
+    if(not isinstance(path, pathlib.Path | str)):
         raise ValueError("Path must be a path object or string.") 
     try:
         excel = openpyxl.load_workbook(path)
@@ -56,12 +56,12 @@ def read_excel_file(path: pathlib.Path | str) -> dict[str,dict[str,int | Any]]:
         # Process each row
         data_list: dict[str,dict[str,int | str | Any]] = {}
         for i in range(2, row + 1):
-            mpn_value=bom.cell(row=i, column=mpn_index).value
-            if mpn_value is None:
+            mpn_value = bom.cell(row=i, column=mpn_index).value
+            if ((mpn_value is None) | (not isinstance(mpn_value, str))):
                 continue
             suppliers = []
             for supplier_index in supplier_indices:
-                 supplier = Supplier (name = bom.cell(row=i, column=supplier_index).value,index = supplier_index)
+                 supplier = Supplier(name = bom.cell(row=i, column=supplier_index).value,index = supplier_index)
                  if supplier.name is None:
                     continue
                  elif not isinstance(supplier.name, str):
@@ -94,7 +94,7 @@ def relevant_column_indices(bom: Any) -> tuple[int | None, list[int]]:
                     continue
                 
             if is_mpn_or_supplier(cell_obj.value,supplier_names):
-                            supplier_indices.append(i)
+                supplier_indices.append(i)
 
         return mpn_index, supplier_indices
     
@@ -108,15 +108,14 @@ def is_mpn_or_supplier(name: str, aliases: list[str]) -> bool:
     if not isinstance(name, str):
         return False
     try:
-        # get ride of characters that aren't a letter or number
-        temp=""
+        # get ride of characters that aren't letters
+        temp = ""
         for character in name:
-            if (character.isalnum()):
-                temp+=character
-        name = temp
-        name = name.lower()
+            if character.isalpha():
+                temp += character
+        name = temp.lower()
         for alias in aliases:
-            if (alias in name):
+            if (alias == name):
                 return True
         return False
     except Exception as e:

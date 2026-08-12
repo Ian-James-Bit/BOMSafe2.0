@@ -16,21 +16,32 @@ def format_data(response: dict, variables: dict[str,dict[str,int | Any]]) -> dic
         for instance in response["PartResults"]:
             if instance["PartNumber"] == mpn:
                 #correct results for this mpn
-                risk_and_column_dict["risk"] = f"Life Cycle Risk: {instance['LifecycleRisk']}\nSupply Chain Risk: {instance['SupplyChainRisk']}"
+                risk_and_column_dict["risk"] = f"Life Cycle Risk: {instance['LifecycleRisk']}; Supply Chain Risk: {instance['SupplyChainRisk']}\n"
                 for supplier in variables[mpn]["suppliers"]:
                     for distributor in instance["Distributors"]:
-                        if distributor["Name"] == supplier.name:
+                        supplier_name = normalize_supplier_name(supplier.name)
+                        distributor_name = normalize_supplier_name(distributor["Name"])
+                        if supplier_name in distributor_name or distributor_name in supplier_name:
                             stock = ""
                             price = ""
                             i = 1
                             for distributor_result in distributor["DistributorResults"]:
-                                stock += f"Offer {i} (SKU: {distributor_result['DistributorPartNumber']}): Quantity on Hand: {distributor_result['Stock']['QuantityOnHand']}; Availibility: {distributor_result['Stock']['Availability']}\n"
-                                price += f"Offer {i} (SKU: {distributor_result['DistributorPartNumber']}): "
+                                stock += f"Offer {i} (SKU: {distributor_result['DistributorPartNumber']}):\n Quantity on Hand: {distributor_result['Stock']['QuantityOnHand']}; Availibility: {distributor_result['Stock']['Availability']}\n"
+                                price += f"Offer {i} (SKU: {distributor_result['DistributorPartNumber']}):\n "
                                 for price_tier in distributor_result["Pricing"]["Prices"]:
                                     price += f"Minimum Quantity: {price_tier['Quantity']}; Price: {price_tier['FormattedAmount']}\n"
                                 i += 1
                             risk_and_column_dict[supplier.index] = {"stock": stock, "price": price}
 
         data[variables[mpn]["row_number"]] = risk_and_column_dict
-
     return data
+
+# normalizes the supplier name to make it easier to compare with the distributor name from the API response
+def normalize_supplier_name(name: str) -> str:
+    temp = ""
+
+    for character in name.lower():
+        if character.isalpha():
+            temp += character
+
+    return temp

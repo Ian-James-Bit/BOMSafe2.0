@@ -66,10 +66,10 @@ def variables():
 def expected_output():
     return {
             2: {
-                'risk': 'Life Cycle Risk: Low\nSupply Chain Risk: High',
+                'risk': 'Life Cycle Risk: Low; Supply Chain Risk: High\n',
                 3: {
-                    'stock': 'Offer 1 (SKU: BAT54BRW-FDICT-ND): Quantity on Hand: 0.0; Availibility: Factory Lead Time: 44 Weeks\n',
-                    'price': 'Offer 1 (SKU: BAT54BRW-FDICT-ND): Minimum Quantity: 1.0; Price: $0.94\nMinimum Quantity: 10.0; Price: $0.581\nMinimum Quantity: 25.0; Price: $0.4852\nMinimum Quantity: 50.0; Price: $0.4258\nMinimum Quantity: 100.0; Price: $0.3755\nMinimum Quantity: 3000.0; Price: $0.22214\nMinimum Quantity: 9000.0; Price: $0.19455\n'
+                    'stock': 'Offer 1 (SKU: BAT54BRW-FDICT-ND):\n Quantity on Hand: 0.0; Availibility: Factory Lead Time: 44 Weeks\n',
+                    'price': 'Offer 1 (SKU: BAT54BRW-FDICT-ND):\n Minimum Quantity: 1.0; Price: $0.94\nMinimum Quantity: 10.0; Price: $0.581\nMinimum Quantity: 25.0; Price: $0.4852\nMinimum Quantity: 50.0; Price: $0.4258\nMinimum Quantity: 100.0; Price: $0.3755\nMinimum Quantity: 3000.0; Price: $0.22214\nMinimum Quantity: 9000.0; Price: $0.19455\n'
                 }
             }
         }

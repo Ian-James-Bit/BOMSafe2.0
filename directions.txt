@@ -8,4 +8,8 @@ directions:
     run (install): pip install python-dotenv
 To run tests:
     python -m pytest
+To run script/use:
+    Upload BOM Excel sheet into input folder
+    run (command): python -m src.main
+    Download updated Excel sheet from output folder
 

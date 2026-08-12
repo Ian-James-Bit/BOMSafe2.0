@@ -63,13 +63,13 @@ def test_relevant_column_indices(test_excel_file, test_excel_file_2, test_excel_
 
 def test_is_mpn_or_supplier():
     assert reading.is_mpn_or_supplier("'MPN",reading.mpn_names) == True
-    assert reading.is_mpn_or_supplier("Manufacture Part Number 1",reading.mpn_names) == True
+    assert reading.is_mpn_or_supplier("Manufacturer Part Number 1",reading.mpn_names) == True
     assert reading.is_mpn_or_supplier("MPN - 1",reading.mpn_names) == True
     assert reading.is_mpn_or_supplier("Supplier",reading.mpn_names) == False
     assert reading.is_mpn_or_supplier("",reading.mpn_names) == False
     assert reading.is_mpn_or_supplier("'Supplier",reading.supplier_names) == True
-    assert reading.is_mpn_or_supplier("Supplier Number 1",reading.supplier_names) == True
-    assert reading.is_mpn_or_supplier("Distributor Number 1",reading.supplier_names) == True
+    assert reading.is_mpn_or_supplier("Supplier Part Number 1",reading.supplier_names) == False
+    assert reading.is_mpn_or_supplier("Distributor Part Number 1",reading.supplier_names) == False
     assert reading.is_mpn_or_supplier("Distributor - 1",reading.supplier_names) == True
     assert reading.is_mpn_or_supplier("MPN",reading.supplier_names) == False
     assert reading.is_mpn_or_supplier("",reading.supplier_names) == False
