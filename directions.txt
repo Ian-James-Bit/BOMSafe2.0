@@ -7,8 +7,10 @@ directions:
     run (update): pip install --upgrade pip
     run (install): pip install python-dotenv
 To run tests:
+    Make sure your in the virtual enviornment: source virtual_environment/bin/activate
     python -m pytest
 To run script/use:
+    Make sure your in the virtual enviornment: source virtual_environment/bin/activate
     Upload BOM Excel sheet into input folder
     run (command): python -m src.main
     Download updated Excel sheet from output folder

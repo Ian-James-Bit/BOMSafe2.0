@@ -7,8 +7,20 @@ from src.API.trustedparts.utilities import format
 from src.excel.writing import add_data_to_bom
 
 def main():
-    input_path = pathlib.Path("data/input/Test_Bom.xlsx")
-    output_path = pathlib.Path("data/output/Test_Bom.xlsx")
+    # Define the input and output directories
+    input_dir = pathlib.Path("data/input")
+    output_dir = pathlib.Path("data/output")
+
+    # Find the first .xlsx file in the input directory
+    # Next(..., None) safely returns None if no file is found
+    input_path = next(input_dir.glob("*.xlsx"), None)
+
+    if input_path:
+        # Reuse the exact same file name for the output path
+        output_path = output_dir / input_path.name
+    else:
+        print("No Excel file found in the input directory.")
+        return
 
     shutil.copy2(input_path, output_path)
 
