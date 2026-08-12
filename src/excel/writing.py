@@ -5,7 +5,7 @@
 import pathlib
 import openpyxl
 from typing import Any
-def add_data_to_bom(path: pathlib.Path | str, data: dict[int, dict[int, dict[str, Any]]]) -> None:
+def add_data_to_bom(path: pathlib.Path | str, data: dict[int, dict[int | str, dict[Any, Any] | str]]) -> None:
     if(not isinstance(path, pathlib.Path | str)):
         raise ValueError("Path must be a path object or string.") 
     try:
@@ -14,15 +14,15 @@ def add_data_to_bom(path: pathlib.Path | str, data: dict[int, dict[int, dict[str
         bom = excel.active 
 
         data = add_new_data_columns(bom, data)
-
         #mpn is row number
         for mpn in data:
+            bom.cell(row=mpn, column=bom.max_column).value = data[mpn].get("risk")
             #suppplier is column index
             for supplier in data[mpn]:
-                #first new column for each supplier is stock, second is price, third is product_risk
-                bom.cell(row=mpn, column=supplier+1).value = data[mpn][supplier].get("stock")
-                bom.cell(row=mpn, column=supplier+2).value = data[mpn][supplier].get("price")
-                bom.cell(row=mpn, column=supplier+3).value = data[mpn][supplier].get("product_risk")
+                if isinstance(supplier, int):
+                    #first new column for each supplier is stock, second is price
+                    bom.cell(row=mpn, column=supplier+1).value = data[mpn][supplier].get("stock")
+                    bom.cell(row=mpn, column=supplier+2).value = data[mpn][supplier].get("price")
         excel.save(path)
     except Exception as e:
         print(f"An unexpected error occured: {e}")
@@ -32,7 +32,7 @@ def add_data_to_bom(path: pathlib.Path | str, data: dict[int, dict[int, dict[str
 
 # creating new columns in the excel sheet next to the relevant supplier column if there is any data for that column in the response
 # and updating the column indices in the data dict to reflect the new column indices in the excel sheet
-def add_new_data_columns(bom, data: dict[int, dict[int, dict[str, Any]]]) -> dict[int, dict[int, dict[str, Any]]]:
+def add_new_data_columns(bom, data: dict[int, dict[int | str, dict[Any, Any] | str]]) -> dict[int, dict[int | str, dict[Any, Any] | str]]:
     try:
         supplier_list = []
         # if there is a new unique supplier column_index in the data, add it to the list
@@ -41,10 +41,11 @@ def add_new_data_columns(bom, data: dict[int, dict[int, dict[str, Any]]]) -> dic
         for mpn in data:
             # supplier is column index
             for supplier in data[mpn]:
-                if supplier in supplier_list:
-                    continue
-                else:
-                    supplier_list.append(supplier)
+                if isinstance(supplier, int): # only want to add new columns for supplier column indices, not the "risk" key
+                    if supplier in supplier_list:
+                        continue
+                    else:
+                        supplier_list.append(supplier)
         supplier_list.sort() # in case not in order        
         # make 3 new colums for each unique column index and update the column indices
         # depending on how many columns before it were added since everything is shifted now
@@ -55,25 +56,29 @@ def add_new_data_columns(bom, data: dict[int, dict[int, dict[str, Any]]]) -> dic
                 if indices < column_index:
                     total += 1
 
-            new_column_index = column_index + 3*total
-            bom.insert_cols(new_column_index + 1,3)
+            new_column_index = column_index + 2*total
+            bom.insert_cols(new_column_index + 1,2)
             #name headers of the new columns
             bom.cell(row=1, column=new_column_index +1).value = f"Stock {i}"
             bom.cell(row=1, column=new_column_index + 2).value = f"Price {i}"
-            bom.cell(row=1, column=new_column_index + 3).value = f"Product Risk {i}"
             i += 1
+        # create column at the end of excel sheet for product risk and fill it in for each product (mpn)
+        new_column = bom.max_column + 1
+        bom.cell(row=1, column=new_column).value = "Product Risk"
         # update the column indices in the data dict to reflect the new column indices in the excel sheet
         for mpn in data:
             new_mpn_value = {}
+            new_mpn_value["risk"] = data[mpn].get("risk")
             for supplier in data[mpn]:
-                for column_index in supplier_list:
-                    total = 0
-                    for indices in supplier_list:
-                        if indices < column_index:
-                            total += 1
-                    new_column_index = column_index + 3*total
-                    if supplier == column_index:
-                        new_mpn_value[new_column_index] = data[mpn][supplier]
+                if isinstance(supplier, int):
+                    for column_index in supplier_list:
+                        total = 0
+                        for indices in supplier_list:
+                            if indices < column_index:
+                                total += 1
+                        new_column_index = column_index + 2*total
+                        if supplier == column_index:
+                            new_mpn_value[new_column_index] = data[mpn][supplier]
             data[mpn] = (new_mpn_value)
         return data
     except Exception as e:
