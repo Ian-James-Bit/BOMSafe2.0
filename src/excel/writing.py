@@ -19,10 +19,10 @@ def add_data_to_bom(path: pathlib.Path | str, data: dict[int, dict[int, dict[str
         for mpn in data:
             #suppplier is column index
             for supplier in data[mpn]:
-                #first new column for each supplier is stock, second is price, third is product_lifecycle_status
+                #first new column for each supplier is stock, second is price, third is product_risk
                 bom.cell(row=mpn, column=supplier+1).value = data[mpn][supplier].get("stock")
                 bom.cell(row=mpn, column=supplier+2).value = data[mpn][supplier].get("price")
-                bom.cell(row=mpn, column=supplier+3).value = data[mpn][supplier].get("product_lifecycle_status")
+                bom.cell(row=mpn, column=supplier+3).value = data[mpn][supplier].get("product_risk")
         excel.save(path)
     except Exception as e:
         print(f"An unexpected error occured: {e}")
@@ -60,7 +60,7 @@ def add_new_data_columns(bom, data: dict[int, dict[int, dict[str, Any]]]) -> dic
             #name headers of the new columns
             bom.cell(row=1, column=new_column_index +1).value = f"Stock {i}"
             bom.cell(row=1, column=new_column_index + 2).value = f"Price {i}"
-            bom.cell(row=1, column=new_column_index + 3).value = f"Product Lifecycle Status {i}"
+            bom.cell(row=1, column=new_column_index + 3).value = f"Product Risk {i}"
             i += 1
         # update the column indices in the data dict to reflect the new column indices in the excel sheet
         for mpn in data:
