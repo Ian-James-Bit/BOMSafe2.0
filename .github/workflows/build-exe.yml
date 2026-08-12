@@ -1,0 +1,32 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller openpyxl requests python-dotenv
+
+      - name: Build BOMSafe
+        run: |
+          pyinstaller --onefile --console --name BOMSafe src/main.py
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v7
+        with:
+          name: BOMSafe-Windows
+          path: dist/BOMSafe.exe
