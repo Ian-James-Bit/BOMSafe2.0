@@ -56,7 +56,7 @@ def login(window, company_id, api_key):
         messagebox.showerror("Error", f"An error occurred: {e}")
         raise
 
-def create_company_ID_and_API_Key(ID: str, Key: str) -> None:
+def create_company_ID_and_API_Key(ID: str, Key: str) -> bool:
     try:
         # Check the credentials
         if not request.check_credentials(ID, Key):
