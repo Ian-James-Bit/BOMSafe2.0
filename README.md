@@ -34,4 +34,4 @@ source virtual_environment/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements-dev.txt
 python -m src.main
-pytest
+python -m pytest
