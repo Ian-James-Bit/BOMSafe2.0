@@ -150,6 +150,7 @@ activemq-data/
 # Environments
 virtual_environment/
 .env
+.env.test
 .envrc
 .venv
 env/
@@ -225,3 +226,14 @@ data/output/*
 #do not ignore folder structure
 !.data/input/.gitkeep
 !.data/output/.gitkeep
+
+__pycache__/
+.pytest_cache/
+*.pyc
+
+data/input/*.xlsx
+data/output/*.xlsx
+
+build/
+dist/
+*.spec

@@ -1,9 +1,12 @@
+import os
 from src.API.trustedparts import request
 import pytest
+from dotenv import load_dotenv
 
 def test_send_get_request(real_variables):
     # Create a sample payload for testing
-    payload = request.create_get_request(real_variables, request.load_API_key(), request.load_Company_ID())
+    load_dotenv(".env.test")
+    payload = request.create_get_request(real_variables, os.getenv("MY_SECRET_API_KEY"), os.getenv("MY_SECRET_COMPANY_ID"))
     response = request.send_get_request(payload)
     assert isinstance(response, dict)
     assert isinstance(response["PartResults"], list)
@@ -34,10 +37,7 @@ def test_load_API_key(monkeypatch):
 
     monkeypatch.delenv("MY_SECRET_API_KEY", raising=False)
     #skip the load_dotenv function to avoid loading the .env file during the test
-    monkeypatch.setattr(
-    "src.API.trustedparts.request.load_dotenv",
-    lambda: None
-    )
+    monkeypatch.setattr("src.API.trustedparts.request.load_dotenv",lambda: None)
     with pytest.raises(ValueError):
         request.load_API_key()
 
@@ -47,9 +47,16 @@ def test_load_Company_ID(monkeypatch):
 
     monkeypatch.delenv("MY_SECRET_COMPANY_ID", raising=False)
     #skip the load_dotenv function to avoid loading the .env file during the test
-    monkeypatch.setattr(
-    "src.API.trustedparts.request.load_dotenv",
-    lambda: None
-    )
+    monkeypatch.setattr("src.API.trustedparts.request.load_dotenv",lambda: None)
     with pytest.raises(ValueError):
         request.load_Company_ID()
+
+def test_check_credentials():
+    # Test with valid credentials
+    load_dotenv(".env.test")
+    assert request.check_credentials(os.getenv("MY_SECRET_COMPANY_ID"),os.getenv("MY_SECRET_API_KEY"))
+
+    # Test with invalid credentials
+    invalid_company_id = "invalid_test_id"
+    invalid_api_key = "invalid_test_key"
+    assert not request.check_credentials(invalid_company_id, invalid_api_key)

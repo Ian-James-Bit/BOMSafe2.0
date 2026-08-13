@@ -90,3 +90,30 @@ def load_Company_ID() -> str:
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         raise
+
+def check_credentials(company_id: str, api_key: str) -> bool:
+    if not isinstance(company_id, str) or not isinstance(api_key, str):
+        raise ValueError("Company ID and API key must be strings.")
+    try:
+        payload = {
+            "CompanyId": company_id,
+            "ApiKey": api_key,
+            "Queries": [{"SearchToken": "BAT54BRW-7-F"}],
+            "IsCrawler": False,
+            "InStockOnly": False,
+            "ExactMatch": True,
+            "UseCachedData": True,
+            "UserAgent": "BOMSAFE2.0 LOGIN"
+        }
+        response = requests.post("https://api.trustedparts.com/v2/search", json=payload)
+        if not response.ok:
+            return False
+        
+        data = response.json()
+        if data.get("ErrorMessage"):
+            return False
+        
+        return True
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        raise
