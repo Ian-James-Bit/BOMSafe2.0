@@ -1,38 +1,58 @@
 import tkinter as tk
 from tkinter import messagebox
 from src.API.trustedparts import request
+import tkinter.font as tkfont
 
 def login_page():
     try:
         global login_success
         login_success = False
+
         login_window = tk.Tk()
-        login_window.title("Login Screen")
-        login_window.geometry('340x440')
+        login_window.title("Login")
+        login_window.geometry('500x300')
         login_window.configure(bg="#7A1C24")
-        frame = tk.Frame(login_window, bg ="#7A1C24")
+
+        normal_font = tkfont.Font(family="Arial", size=16)
+        title_font = tkfont.Font(family="Arial", size=30)
+
+        def resize_fonts(event):
+            scale = 1 + ((event.width / 500) - 1) * 0.35
+            scale = max(1, min(scale, 1.5))
+
+            normal_font.configure(size=int(16 * scale))
+            title_font.configure(size=int(30 * scale))
+
+        frame = tk.Frame(login_window, bg="#7A1C24")
+        frame.pack(fill="both", expand=True, padx=30, pady=30)
+
+        # Entry column expands with the window
+        frame.columnconfigure(1, weight=1)
 
         #making widgets(buttons)
-        login_label = tk.Label(frame, text="Login", bg ="#7A1C24", fg="#6C7054", font=("Arial", 30))
-        company_ID_label = tk.Label(frame, text="API Company ID", bg ="#7A1C24", fg="#FFFFFF", font=("Arial", 16))
-        company_ID_entry = tk.Entry(frame, font=("Arial", 16))
-        API_key_label = tk.Label(frame, text="API Key", bg ="#7A1C24", fg="#FFFFFF", font=("Arial", 16))
-        API_key_entry = tk.Entry(frame, show="*", font=("Arial", 16))
-        login_button = tk.Button(frame, text="Login", bg ="#6C7054", fg="#FFFFFF", font=("Arial", 16), command=lambda: login(login_window, company_ID_entry.get(),API_key_entry.get()))
+        login_label = tk.Label(frame, text="Login", bg="#7A1C24", fg="#6C7054", font=title_font)
+        company_ID_label = tk.Label(frame, text="API Company ID", bg="#7A1C24", fg="#FFFFFF", font=normal_font)
+        company_ID_entry = tk.Entry(frame, font=normal_font)
+        API_key_label = tk.Label(frame, text="API Key", bg="#7A1C24", fg="#FFFFFF", font=normal_font)
+        API_key_entry = tk.Entry(frame, show="*", font=normal_font)
+        login_button = tk.Button(frame, text="Login", bg="#6C7054", fg="#FFFFFF", font=normal_font, command=lambda: login(login_window, company_ID_entry.get(), API_key_entry.get()))
 
         #placing widgets on window
-        login_label.grid(row=0, column=0, columnspan=2, sticky="news", pady=40)
-        company_ID_label.grid(row=1, column=0)
-        company_ID_entry.grid(row=1, column=1, pady=20)
-        API_key_label.grid(row=2, column=0)
-        API_key_entry.grid(row=2, column=1, pady=20)
+        login_label.grid(row=0, column=0, columnspan=2, pady=(0,30))
+
+        company_ID_label.grid(row=1, column=0, sticky="w", pady=10, padx=(0,10))
+        company_ID_entry.grid(row=1, column=1, sticky="ew", pady=10)
+
+        API_key_label.grid(row=2, column=0, sticky="w", pady=10, padx=(0,10))
+        API_key_entry.grid(row=2, column=1, sticky="ew", pady=10)
+
         login_button.grid(row=3, column=0, columnspan=2, pady=30)
 
-        frame.pack()
+        login_window.bind("<Configure>", resize_fonts)
 
         login_window.mainloop()
 
-        return login_success  # Return True to indicate successful login
+        return login_success
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {e}")
         raise

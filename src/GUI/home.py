@@ -3,6 +3,7 @@ from tkinter import messagebox, filedialog
 import shutil
 import pathlib
 import tempfile
+import tkinter.font as tkfont
 
 from src.excel.reading import read_excel_file
 from src.API.trustedparts import request
@@ -13,29 +14,43 @@ def switch_to_main_application():
     try:
         # Create the main application window
         home_window = tk.Tk()
-        home_window.title("BOM Home")
-        home_window.geometry('340x440')
+        home_window.title("BOMSafe")
+        home_window.geometry('700x300')
         home_window.configure(bg="#7A1C24")
 
         # holds the BOM we will edit until they download it
         processed_file = {"path": None}
 
-        # Build the new window content in place
-        home_window.title("BOM Home")
-        lbl = tk.Label(home_window, text="Welcome to the Home Screen!", font=("Arial", 16))
-        lbl.pack(pady=50)
+        normal_font = tkfont.Font(family="Arial", size=14)
 
-        # create upload section
-        tk.Label(home_window, text="Upload File Path:").pack(pady=5)
-        upload_entry = tk.Entry(home_window, width=50)
-        upload_entry.pack(pady=5)
-        tk.Button(home_window, text="Browse & Upload", command=lambda: upload_file(upload_entry, processed_file, download_entry)).pack(pady=5)
+        def resize_fonts(event):
+            scale = 1 + ((event.width / 700) - 1) * 0.35
+            scale = max(1, min(scale, 1.5))
+            normal_font.configure(size=int(14 * scale))
 
-        # create download section
-        tk.Label(home_window, text="Download Save Path:").pack(pady=5)
-        download_entry = tk.Entry(home_window, width=50)
-        download_entry.pack(pady=5)
-        tk.Button(home_window, text="Save / Download", command=lambda: download_file(processed_file)).pack(pady=5)
+        frame = tk.Frame(home_window, bg="#7A1C24")
+        frame.pack(fill="both", expand=True, padx=30, pady=30)
+
+        # The middle column expands when the window gets wider
+        frame.columnconfigure(1, weight=1)
+
+        # Upload row
+        tk.Label(frame, text="Upload File Path:", bg="#7A1C24", fg="#FFFFFF", font=normal_font).grid(row=0, column=0, sticky="w", pady=10, padx=(0,10))
+
+        upload_entry = tk.Entry(frame, font=normal_font)
+        upload_entry.grid(row=0, column=1, sticky="ew", pady=10)
+
+        tk.Button(frame, text="Browse & Upload", bg="#6C7054", fg="#FFFFFF", font=normal_font, command=lambda: upload_file(upload_entry, processed_file, download_entry)).grid(row=0, column=2, pady=10, padx=(10,0))
+
+        # Download row
+        tk.Label(frame, text="Download Save Path:", bg="#7A1C24", fg="#FFFFFF", font=normal_font).grid(row=1, column=0, sticky="w", pady=10, padx=(0,10))
+
+        download_entry = tk.Entry(frame, font=normal_font)
+        download_entry.grid(row=1, column=1, sticky="ew", pady=10)
+
+        tk.Button(frame, text="Save / Download", bg="#6C7054", fg="#FFFFFF", font=normal_font, command=lambda: download_file(processed_file)).grid(row=1, column=2, pady=10, padx=(10,0))
+
+        home_window.bind("<Configure>", resize_fonts)
 
         home_window.mainloop()
     except Exception as e:

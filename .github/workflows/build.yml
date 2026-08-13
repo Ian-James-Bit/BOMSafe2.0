@@ -2,19 +2,29 @@ name: Build Executables
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+
+permissions:
+  contents: write
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - windows-latest
-          - macos-latest
-          - ubuntu-latest
+        include:
+          - os: windows-latest
+            artifact_name: BOMSafe-Windows
+            artifact_path: BOMSafe-Windows.exe
+
+          - os: macos-latest
+            artifact_name: BOMSafe-macOS
+            artifact_path: BOMSafe-macOS.zip
+
+          - os: ubuntu-latest
+            artifact_name: BOMSafe-Linux
+            artifact_path: BOMSafe-Linux.tar.gz
 
     runs-on: ${{ matrix.os }}
 
@@ -35,25 +45,35 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        pyinstaller --onefile --console --paths . --name=BOMSafe src/main.py
+        pyinstaller --onefile --windowed --paths . --name=BOMSafe src/main.py
 
-    - name: Upload Windows Executable
+    - name: Prepare Windows Release
       if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v7
-      with:
-        name: BOMSafe-Windows
-        path: dist/BOMSafe.exe
+      shell: pwsh
+      run: |
+        Copy-Item dist/BOMSafe.exe BOMSafe-Windows.exe
 
-    - name: Upload macOS Executable
+    - name: Prepare macOS Release
       if: matrix.os == 'macos-latest'
-      uses: actions/upload-artifact@v7
-      with:
-        name: BOMSafe-macOS
-        path: dist/BOMSafe
+      run: |
+        ditto -c -k --sequesterRsrc --keepParent dist/BOMSafe.app BOMSafe-macOS.zip
 
-    - name: Upload Linux Executable
+    - name: Prepare Linux Release
       if: matrix.os == 'ubuntu-latest'
+      run: |
+        cp dist/BOMSafe BOMSafe-Linux
+        chmod +x BOMSafe-Linux
+        tar -czf BOMSafe-Linux.tar.gz BOMSafe-Linux
+
+    - name: Upload Actions Artifact
       uses: actions/upload-artifact@v7
       with:
-        name: BOMSafe-Linux
-        path: dist/BOMSafe
+        name: ${{ matrix.artifact_name }}
+        path: ${{ matrix.artifact_path }}
+
+    - name: Upload to GitHub Release
+      if: github.event_name == 'release'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release upload "${{ github.event.release.tag_name }}" "${{ matrix.artifact_path }}" --clobber
